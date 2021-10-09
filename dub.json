@@ -1,0 +1,46 @@
+{
+  "name": "dcd",
+  "description": "The D Completion Daemon is an auto-complete program for the D programming language",
+  "copyright": "Copyright © 2015-2020, Brian Schott",
+  "authors": [
+    "Brian Schott"
+  ],
+  "license": "GPL-3.0",
+  "dependencies": {
+    ":dsymbol": "*",
+    ":libdparse": "*",
+    ":common": "*",
+    "stdx-allocator": "~>3.1.0-beta.2",
+    "emsi_containers": "~>0.8.0"
+  },
+  "subPackages": ["common", "dsymbol", "libdparse"],
+  "versions": ["built_with_dub"],
+  "configurations": [
+    {
+      "name": "library",
+      "targetType": "library",
+      "excludedSourceFiles": [
+        "src/dcd/client/*",
+        "src/dcd/server/main.d"
+      ]
+    },
+    {
+      "name": "client",
+      "targetType": "executable",
+      "targetPath": "bin/",
+      "targetName": "dcd-client",
+      "excludedSourceFiles": [
+        "src/dcd/server/*"
+      ]
+    },
+    {
+      "name": "server",
+      "targetType": "executable",
+      "targetPath": "bin/",
+      "targetName": "dcd-server",
+      "excludedSourceFiles": [
+        "src/dcd/client/*"
+      ]
+    }
+  ]
+}

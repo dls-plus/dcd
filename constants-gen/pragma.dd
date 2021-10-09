@@ -1,0 +1,244 @@
+Ddoc
+
+$(SPEC_S Pragmas,
+
+$(HEADERNAV_TOC)
+
+$(GRAMMAR
+$(GNAME Pragma):
+    $(D pragma) $(D $(LPAREN)) $(GLINK_LEX Identifier) $(D $(RPAREN))
+    $(D pragma) $(D $(LPAREN)) $(GLINK_LEX Identifier) $(D ,) $(GLINK2 expression, ArgumentList) $(D $(RPAREN))
+)
+
+
+        $(P Pragmas are a way to pass special information to the compiler
+        and to add vendor specific extensions to D.
+        Pragmas can be used by themselves terminated with a $(SINGLEQUOTE ;),
+        they can influence a statement, a block of statements, a declaration, or
+        a block of declarations.
+        )
+
+        $(P Pragmas can appear as either declarations,
+        $(I Pragma) $(GLINK2 attribute, DeclarationBlock),
+        or as statements,
+        $(GLINK2 statement, PragmaStatement).
+        )
+
+-----------------
+pragma(ident);        // just by itself
+
+pragma(ident) declaration; // influence one declaration
+
+pragma(ident): // influence subsequent declarations
+    declaration;
+    declaration;
+
+pragma(ident)   // influence block of declarations
+{
+    declaration;
+    declaration;
+}
+
+pragma(ident) statement; // influence one statement
+
+pragma(ident)   // influence block of statements
+{
+    statement;
+    statement;
+}
+-----------------
+
+        $(P The kind of pragma it is determined by the $(I Identifier).
+        $(GLINK2 expression, ArgumentList) is a comma-separated list of
+        $(ASSIGNEXPRESSION)s. The $(ASSIGNEXPRESSION)s must be
+        parsable as expressions, but their meaning
+        is up to the individual pragma semantics.
+        )
+
+$(H2 $(LEGACY_LNAME2 Predefined-Pragmas, predefined-pragmas, Predefined Pragmas))
+
+$(P All implementations must support these, even if by just ignoring them:)
+
+$(UL
+    $(LI $(LINK2 #inline, pragma inline))
+    $(LI $(LINK2 #lib, pragma lib))
+    $(LI $(LINK2 #linkerDirective, pragma linkerDirective))
+    $(LI $(LINK2 #mangle, pragma mangle))
+    $(LI $(LINK2 #msg, pragma msg))
+    $(LI $(LINK2 #startaddress, pragma startaddress))
+)
+
+    $(IMPLEMENTATION_DEFINED An implementation may ignore these pragmas.)
+
+$(H3 $(LNAME2 inline, $(D pragma inline)))
+
+    $(P Affects whether functions are inlined or not. If at the declaration level, it
+     affects the functions declared in the block it controls. If inside a function, it
+     affects the function it is enclosed by.)
+
+     $(P It takes three forms:)
+     $(OL
+        $(LI
+---
+pragma(inline)
+---
+        Sets the behavior to match the implementation's default behavior.
+        )
+        $(LI
+---
+pragma(inline, false)
+---
+        Functions are never inlined.
+        )
+        $(LI
+---
+pragma(inline, true)
+---
+        Always inline the functions.
+        )
+      )
+
+    $(P There can be only zero or one $(I AssignExpression)s. If one is there, it must
+    be `true`, `false`, or an integer value. An integer value is implicitly converted
+    to a bool.)
+
+    $(P If there are multiple pragma inlines in a function,
+    the lexically last one takes effect.)
+---
+pragma(inline):
+int foo(int x) // foo() is never inlined
+{
+    pragma(inline, true);
+    ++x;
+    pragma(inline, false); // supercedes the others
+    return x + 3;
+}
+---
+
+    $(IMPLEMENTATION_DEFINED
+    $(OL
+    $(LI The default inline behavior is typically selectable with a compiler switch
+    such as $(DDSUBLINK dmd, switch-inline, $(TT -inline).))
+    $(LI Whether a particular function can be inlined or not is implementation defined.)
+    $(LI What happens for `pragma(inline, true)` if the function cannot be inlined.
+    An error message is typical.)
+    ))
+
+$(H3 $(LNAME2 lib, $(D pragma lib)))
+
+    $(P There must be one $(ASSIGNEXPRESSION) and it must evaluate at compile time to a string literal.
+    )
+-----------------
+pragma(lib, "foo.lib");
+-----------------
+
+    $(IMPLEMENTATION_DEFINED
+    Typically, the string literal specifies the file name of a library file. This name
+    is inserted into the generated object file, or otherwise is passed to the linker,
+    so the linker automatically links in that library.
+    )
+
+$(H3 $(LNAME2 linkerDirective, $(D pragma linkerDirective)))
+
+    $(P There must be one $(ASSIGNEXPRESSION) and it must evaluate at compile time to a string literal.
+    )
+-----------------
+pragma(linkerDirective, "/FAILIFMISMATCH:_ITERATOR_DEBUG_LEVEL=2");
+-----------------
+
+    $(IMPLEMENTATION_DEFINED
+    $(P The string literal specifies a linker directive to be embedded in the generated object file.)
+
+    $(P Linker directives are only supported for MS-COFF output.)
+    )
+
+$(H3 $(LNAME2 mangle, $(D pragma mangle)))
+
+    $(P Overrides the default mangling for a symbol.)
+
+    $(P There must be one $(ASSIGNEXPRESSION) and it must evaluate at compile time to a string literal.
+    )
+
+    $(IMPLEMENTATION_DEFINED On macOS and Win32, an extra underscore (`_`) is prepended to the string
+        since 2.079, as is done by the C/C++ toolchain. This allows using the same `pragma(mangle)`
+        for all compatible (POSIX in one case, win64 in another) platforms instead of having to special-case.
+    )
+
+    $(IMPLEMENTATION_DEFINED It's only effective
+        when the symbol is a function declaration or a variable declaration.
+        For example this allows linking to a symbol which is a D keyword, which would normally
+        be disallowed as a symbol name:
+    )
+-----------------
+pragma(mangle, "body")
+extern(C) void body_func();
+-----------------
+
+
+$(H3 $(LNAME2 msg, $(D pragma msg)))
+
+    $(P Constructs a message from the $(I ArgumentList).)
+
+-----------------
+pragma(msg, "compiling...", 1, 1.0);
+-----------------
+
+    $(IMPLEMENTATION_DEFINED The arguments are typically presented to the user during compilation,
+    such as by printing them to the standard error stream.)
+
+
+$(H3 $(LNAME2 startaddress, $(D pragma startaddress)))
+
+    $(P There must be one $(ASSIGNEXPRESSION) and it must evaluate at compile time to a function symbol.)
+
+    $(IMPLEMENTATION_DEFINED The function symbol specifies the start address for the program.
+    The symbol is inserted into the object file or is otherwise presented to the linker to
+    set the start address.
+    This is not normally used for application level programming,
+    but is for specialized systems work.
+    For applications code, the start address is taken care of
+    by the runtime library.
+
+-----------------
+void foo() { ... }
+pragma(startaddress, foo);
+-----------------
+
+    )
+
+$(H2 $(LNAME2 vendor_specific_pragmas, Vendor Specific Pragmas))
+
+        $(P Vendor specific pragma $(I Identifier)s can be defined if they
+        are prefixed by the vendor's trademarked name, in a similar manner
+        to version identifiers:
+        )
+
+    ---
+    pragma(DigitalMars_extension) { ... }
+    ---
+
+    $(P Implementations must diagnose an error for unrecognized $(I Pragma)s,
+    even if they are vendor specific ones.
+    )
+
+    $(IMPLEMENTATION_DEFINED Vendor specific pragmas.)
+
+
+    $(BEST_PRACTICE vendor
+        specific pragmas should be wrapped in version statements
+
+    ---
+    version (DigitalMars)
+    {
+        pragma(DigitalMars_extension)
+        {   ... }
+    }
+    ---
+    )
+
+$(SPEC_SUBNAV_PREV_NEXT attribute, Attributes, expression, Expressions)
+)
+
+Macros:
+        CHAPTER=9
+        TITLE=Pragmas

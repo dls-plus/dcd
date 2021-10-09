@@ -1,0 +1,14 @@
+identifiers
+Bar	l
+__monitor	v
+__vptr	v
+alignof	k
+classinfo	v
+foo	f
+i	v
+init	k
+j	v
+mangleof	k
+sizeof	k
+stringof	k
+tupleof	k

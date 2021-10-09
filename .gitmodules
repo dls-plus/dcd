@@ -1,0 +1,7 @@
+[submodule "msgpack-d"]
+	path = msgpack-d
+	url = https://github.com/msgpack/msgpack-d.git
+	url = https://github.com/dlang-community/stdx-allocator
+[submodule "d-test-utils"]
+	path = d-test-utils
+	url = https://github.com/dlang-community/d-test-utils.git

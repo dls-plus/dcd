@@ -1,0 +1,13 @@
+{
+	"name": "dsymbol",
+	"description": "Symbol lookup support for libdparse",
+	"license": "BSL-1.0",
+	"authors": ["Brian Schott"],
+	"targetPath": "build",
+	"targetType": "library",
+	"dependencies": {
+		"libdparse": ">=0.14.0 <0.19.0",
+		"emsi_containers": "~>0.8.0",
+		"stdx-allocator": "~>2.77.5"
+	}
+}

@@ -1,0 +1,2 @@
+foo\nF
+bar\nB

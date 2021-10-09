@@ -1,0 +1,15 @@
+identifiers
+__monitor	v
+__vptr	v
+alignof	k
+classinfo	v
+init	k
+mangleof	k
+member1	f
+member2	f
+member3	f
+member4	f
+member5	f
+sizeof	k
+stringof	k
+tupleof	k
