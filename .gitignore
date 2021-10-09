@@ -1,0 +1,30 @@
+# Windows binaries
+*.exe
+*.obj
+*.lib
+*.dll
+
+# *nix binaries
+bin/
+*.o
+*.a
+*.so
+
+# Perf reports
+perf.data
+perf.data.old
+
+# Valgrind reports
+callgrind.*
+
+# GDB temp files
+.gdb_history
+
+# Test results
+tests/tc*/actual*.txt
+stderr.txt
+stdout.txt
+
+# Dub files
+.dub
+dub.selections.json
